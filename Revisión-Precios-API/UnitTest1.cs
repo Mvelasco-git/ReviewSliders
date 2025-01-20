@@ -1,15 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-
-
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using WebDriverManager;
 using WebDriverManager.DriverConfigs.Impl;
-
-
 using AventStack.ExtentReports;
 using AventStack.ExtentReports.Reporter;
 using AventStack.ExtentReports.Reporter.Config;
@@ -122,6 +118,21 @@ namespace SeleniumExtentReportTest
             catch (Exception e)
             {
                 throw (e);
+            }
+        }
+
+        [Test]
+        public void AbMazdaMXSite()
+        {
+            try
+            {
+                DealerSession dealerSession = new DealerSession(driver);
+                String s = string.Empty;
+                dealerSession.reviewWebSite(arrVehiculos, seoCheck, fichaCheck);
+            }
+            catch (Exception err)
+            {
+                throw (err);
             }
         }
 
