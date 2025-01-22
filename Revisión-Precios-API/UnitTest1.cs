@@ -14,6 +14,7 @@ using NUnit.Framework.Interfaces;
 using SpreadsheetLight;
 
 using Revisión_Precios_APITest;
+using SharpCompress.Common;
 
 namespace SeleniumExtentReportTest
 {
@@ -78,29 +79,36 @@ namespace SeleniumExtentReportTest
                 _test = _extent.CreateTest(TestContext.CurrentContext.Test.Name);
                 var dir = AppDomain.CurrentDomain.BaseDirectory.Replace("\\bin\\Debug", "");
                 pathFile = dir + "Dealers.xlsx";
-                using (SLDocument sl = new SLDocument(pathFile))
-                {
-                    int iRow = 2;
-                    int iColumn = 1;
-                    arrVehiculos = new string[iRow - 1, 35];
 
-                    while (!string.IsNullOrEmpty(sl.GetCellValueAsString(iRow, 1)))
+                using (FileStream fileStream = new FileStream(pathFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    using (StreamReader streamReader = new StreamReader(fileStream))
                     {
-                        string[,] newArray = new string[iRow - 1, 35];
-                        Array.Copy(arrVehiculos, newArray, arrVehiculos.Length);
-                        arrVehiculos = newArray;
-                        iColumn = 1;
-                        while (!string.IsNullOrEmpty(sl.GetCellValueAsString(iRow, iColumn)))
+                        var slDocument = new SLDocument(fileStream);
+
+                        //using (SLDocument sl = new SLDocument(pathFile))
+                        //{
+                        int iRow = 2;
+                        int iColumn = 1;
+                        arrVehiculos = new string[iRow - 1, 35];
+
+                        while (!string.IsNullOrEmpty(slDocument.GetCellValueAsString(iRow, 1)))
                         {
-                            nombreVehiculo = sl.GetCellValueAsString(iRow, iColumn);
-                            arrVehiculos[iRow - 2, iColumn - 1] = nombreVehiculo;
-                            iColumn++;
+                            string[,] newArray = new string[iRow - 1, 35];
+                            Array.Copy(arrVehiculos, newArray, arrVehiculos.Length);
+                            arrVehiculos = newArray;
+                            iColumn = 1;
+                            while (!string.IsNullOrEmpty(slDocument.GetCellValueAsString(iRow, iColumn)))
+                            {
+                                nombreVehiculo = slDocument.GetCellValueAsString(iRow, iColumn);
+                                arrVehiculos[iRow - 2, iColumn - 1] = nombreVehiculo;
+                                iColumn++;
+                            }
+                            iRow++;
+                            iColumn = 1;
                         }
-                        iRow++;
-                        iColumn = 1;
                     }
                 }
-
                 //userEnviorement = "mazda-qa:qaqwpozxmn09";
                 //enviorement = "qa.mdp.mzd.mx";
                 //enviorement = "www.mazda.mx";

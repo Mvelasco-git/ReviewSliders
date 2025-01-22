@@ -503,59 +503,6 @@ namespace Revisión_Precios_APITest
 
         }
 
-        public class Vehicle
-        {
-            public bool verify { get; set; }
-            public string image_name { get; set; }
-            public string category { get; set; }
-            public string name { get; set; }
-            public string type { get; set; }
-            public string model { get; set; }
-            public string modelPrice { get; set; }
-
-            public List<Version> versions { get; set; }
-
-        }
-
-        public class Version
-        {
-            public string name { get; set; }
-            public string price { get; set; }
-            public string hp { get; set; }
-            public string torque { get; set; }
-            public string motor { get; set; }
-        }
-
-        public class vehicles
-        {
-            public string id { get; set; }
-            public string year { get; set; }
-            public string name { get; set; }
-            public string code { get; set; }
-            public List<trims> Trims { get; set; }
-
-        }
-
-        public class trims
-        {
-            public string id { get; set; }
-            public string name { get; set; }
-            public string code { get; set; }
-            public string price { get; set; }
-        }
-
-        public class ApiResponse
-        {
-            public bool Success { get; set; } // Mapea el valor booleano del JSON que indica si la operación fue exitosa.
-            public int StatusCode { get; set; } // Mapea el código de estado HTTP de la respuesta.
-            public List<string> Errors { get; set; } // Lista que puede contener mensajes de error relacionados con la solicitud.
-            public Body Body { get; set; } // Representa el "cuerpo" de la respuesta, que contiene datos específicos (en este caso, vehículos).
-        }
-
-        public class Body
-        {
-            public List<vehicles> Vehicles { get; set; } // Lista de vehículos, cada uno con sus propios detalles y trims.
-        }
         public List<Vehicle> ReadVehiclesFromExcel(string filePath)
         {
             var vehicles = new List<Vehicle>();
@@ -654,70 +601,127 @@ namespace Revisión_Precios_APITest
             }
             return vehicles;
         }
+
+        public class Vehicle
+        {
+            public bool verify { get; set; }
+            public string image_name { get; set; }
+            public string category { get; set; }
+            public string name { get; set; }
+            public string type { get; set; }
+            public string model { get; set; }
+            public string modelPrice { get; set; }
+            public List<Version> versions { get; set; }
+
+        }
+
+        public class Version
+        {
+            public string name { get; set; }
+            public string price { get; set; }
+            public string hp { get; set; }
+            public string torque { get; set; }
+            public string motor { get; set; }
+        }
+
+        public class ApiResponse
+        {
+            public bool Success { get; set; } // Mapea el valor booleano del JSON que indica si la operación fue exitosa.
+            public int StatusCode { get; set; } // Mapea el código de estado HTTP de la respuesta.
+            public List<string> Errors { get; set; } // Lista que puede contener mensajes de error relacionados con la solicitud.
+            public Body Body { get; set; } // Representa el "cuerpo" de la respuesta, que contiene datos específicos (en este caso, vehículos).
+        }
+
+        public class Body
+        {
+            public List<vehiclesJson> vehicles { get; set; } // Lista de vehículos, cada uno con sus propios detalles y trims.
+        }
+
+        public class vehiclesJson
+        {
+            public string id { get; set; }
+            public string year { get; set; }
+            public string name { get; set; }
+            public string code { get; set; }
+            public List<trimsJson> trims { get; set; }
+
+        }
+
+        public class trimsJson
+        {
+            public string id { get; set; }
+            public string name { get; set; }
+            public string code { get; set; }
+            public string price { get; set; }
+        }
+
         public void reviewWebSite(string[,] arrVehiculos, bool seoCheck, bool fichaCheck)
         {
-            //string carPrice2;
             try
             {
-                var vehicles = ReadVehiclesFromExcel(@"C:\Users\mvelasc2\source\repos\Automation-Mazda\MazdaMX2\MazdaMX2\Dealers.xlsx");
+                var ArrVehiclesExcel = ReadVehiclesFromExcel(@"C:\Users\mvelasc2\source\repos\Revisión-Precios-API\Revisión-Precios-API\Dealers.xlsx");
 
                 DealerSession dealerSession = new DealerSession(_driver);
                 dealerSession.IngresarURLWeb(enviorement);
 
-                IWebElement ctaAceptarCookies = DealerSession.WaitObjects("//a[@id='opt-accept']", _driver, 1);
-                dealerSession.ClickMethod(ctaAceptarCookies, _driver);
+                /*IWebElement ctaAceptarCookies = DealerSession.WaitObjects("//a[@id='opt-accept']", _driver, 1);
+                dealerSession.ClickMethod(ctaAceptarCookies, _driver);*/
 
-                var clientAPI = new RestClient("https://cms.mazda.mx/");
+                var clientAPI = new RestClient("https://www.mazda.mx/");
                 var resquestAPI = new RestRequest("api/vehicle/current/format-1", Method.Get);
                 RestResponse response = clientAPI.Get(resquestAPI);
                 var content = response.Content;
                 var carsInformationJson = JsonConvert.DeserializeObject<ApiResponse>(content);
 
                 //var reponseBody = response.Content;
-                List<string> responseBodyList = content.Replace("},", "").Replace("]", "").Trim().Split('{', '}').ToList();
+                //List<string> responseBodyList = content.Replace("},", "").Replace("]", "").Trim().Split('{', '}').ToList();
 
                 int indexExcel = 0;
 
-                foreach (var item in vehicles)
+                foreach (var itemExcel in ArrVehiclesExcel)
                 {
-                    if (item.verify)
+                    if (itemExcel.verify)
                     {
                         IWebElement lnkVehiculos = DealerSession.WaitObjects("//*[@data-analytics-link-description='VEHÍCULOS']", _driver, 0);
                         dealerSession.ClickMethod(lnkVehiculos, _driver);
                         dealerSession.WaitForPageLoad();
 
-                        IWebElement categoVehicle = DealerSession.WaitObjects("//div[@id='categories']/div[@data-category='" + item.category + "']", _driver, 1);
+                        IWebElement categoVehicle = DealerSession.WaitObjects("//div[@id='categories']/div[@data-category='" + itemExcel.category + "']", _driver, 1);
                         dealerSession.ClickMethod(categoVehicle, _driver);
 
-                        IWebElement imgVehiculo = DealerSession.WaitObjects("//*[@data-analytics-link-description='" + $"{item.name} {item.type}".Trim() + "']/div[@class='carBox']/img", _driver, 1);
-                        dealerSession.ValidateImage(imgVehiculo, item.image_name);
+                        IWebElement imgVehiculo = DealerSession.WaitObjects("//*[@data-analytics-link-description='" + $"{itemExcel.name} {itemExcel.type}".Trim() + "']/div[@class='carBox']/img", _driver, 1);
+                        dealerSession.ValidateImage(imgVehiculo, itemExcel.image_name);
 
+                        dealerSession.OnlyWait();
                         List<IWebElement> textNameCar = new List<IWebElement>(_driver.FindElements(By.XPath("//*[@class='carName table-title']")));
                         List<IWebElement> priceCar = new List<IWebElement>(_driver.FindElements(By.XPath("//*[@class='carPrice table-title']")));
 
                         var siteTextName = textNameCar[indexExcel].Text;
-                        var siteCarPrice = priceCar[indexExcel].Text.Substring(8, 7);
+                        var siteCarPrice = priceCar[indexExcel].Text.Substring(8, priceCar[indexExcel].Text.Length - 9);
 
-                        dealerSession.ValidationText(siteTextName, $"{item.name} {item.type}".Trim() + $" {item.model}");
-                        dealerSession.ValidationText(siteCarPrice, item.modelPrice);
+                        dealerSession.ValidationText(siteTextName, $"{itemExcel.name} {itemExcel.type}".Trim() + $" {itemExcel.model}");
+                        dealerSession.ValidationText(siteCarPrice, itemExcel.modelPrice);
 
                         dealerSession.ClickMethod(imgVehiculo, _driver);
 
-                        IWebElement cardVehicle = DealerSession.WaitObjects("//*[@data-analytics-link-description='IR A VERSIONES']", _driver, 0);
-                        OpenQA.Selenium.Interactions.Actions actions = new OpenQA.Selenium.Interactions.Actions(_driver);
-                        actions.MoveToElement(cardVehicle).Perform();
-
                         List<IWebElement> cardsVersion = new List<IWebElement>(_driver.FindElements(By.XPath("//*[@class='mde-versions-vlp__card--info']")));
 
-                        foreach (var vehicledelaweb in carsInformationJson.Body.Vehicles)
+                        if (cardsVersion.Count > 0)
                         {
-                            if (vehicledelaweb.name == $"{item.name} {item.type}".Trim() + $" {item.model}")
+                            IWebElement cardVehicle = DealerSession.WaitObjects("//*[@data-analytics-link-description='IR A VERSIONES']", _driver, 0);
+                            OpenQA.Selenium.Interactions.Actions actions = new OpenQA.Selenium.Interactions.Actions(_driver);
+                            actions.MoveToElement(cardVehicle).Perform();
+                        }
+                       
+                        foreach (var vehicleOfJson in carsInformationJson.Body.vehicles)
+                        {
+                            if (vehicleOfJson.name == $"{itemExcel.name} {itemExcel.type}".Trim() + $" {itemExcel.model}")
                             {
                                 int indiceVerExcel = 0;
-                                for (int versionsCarJson = 0; versionsCarJson < vehicledelaweb.Trims.Count; versionsCarJson++)
+                                for (int versionsCarIndex = 0; versionsCarIndex < vehicleOfJson.trims.Count; versionsCarIndex++)
                                 {
                                     var arrNameVehicles = new List<string>();
-                                    arrNameVehicles.AddRange(vehicledelaweb.Trims[versionsCarJson].name.Split(' '));
+                                    arrNameVehicles.AddRange(vehicleOfJson.trims[versionsCarIndex].name.Split(' '));
                                     var totWordsDes = arrNameVehicles.Count;
                                     var versionJson = "";
 
@@ -734,19 +738,19 @@ namespace Revisión_Precios_APITest
                                             break;
                                     }
 
-                                    if (item.name.Contains("MAZDA2") || (item.name.Contains("MAZDA3") && item.type.Contains("SEDÁN")))
+                                    if (itemExcel.name.Contains("MAZDA2") || (itemExcel.name.Contains("MAZDA3") && itemExcel.type.Contains("SEDÁN")))
                                     {
                                         if (arrNameVehicles[totWordsDes - 1] == "TA" && (versionJson == "I" || versionJson == "I SPORT"))
                                         {
                                             indiceVerExcel = indiceVerExcel - 1;
-                                            int precioTA = int.Parse(item.versions[indiceVerExcel].price.Replace(",", ""));
-                                            item.versions[indiceVerExcel].price = (precioTA + 10000).ToString();
+                                            int precioTA = int.Parse(itemExcel.versions[indiceVerExcel].price.Replace(",", ""));
+                                            itemExcel.versions[indiceVerExcel].price = (precioTA + 10000).ToString();
                                         }
                                     }
 
-                                    if (item.versions[indiceVerExcel].name.ToUpper() != versionJson || item.versions[indiceVerExcel].price.Replace(",", "") != vehicledelaweb.Trims[versionsCarJson].price)
+                                    if (itemExcel.versions[indiceVerExcel].name.ToUpper() != versionJson || itemExcel.versions[indiceVerExcel].price.Replace(",", "") != vehicleOfJson.trims[versionsCarIndex].price)
                                     {
-                                        throw new Exception("La informarción del vehículo no corresponde: ");
+                                        throw new Exception($"La informarción del vehículo no corresponde, Vehículo: {arrNameVehicles[0]} {versionJson} {arrNameVehicles[totWordsDes - 1]}, Precio: {vehicleOfJson.trims[versionsCarIndex].price}");
                                     }
 
                                     indiceVerExcel++;
