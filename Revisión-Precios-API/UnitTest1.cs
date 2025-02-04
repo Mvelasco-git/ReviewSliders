@@ -23,7 +23,7 @@ namespace SeleniumExtentReportTest
     {
         public IWebDriver driver;
         protected ExtentReports _extent;
-        protected ExtentTest _test;
+        public ExtentTest _test;
         public WebDriverWait wait;
 
         public string pathFile;
@@ -50,7 +50,14 @@ namespace SeleniumExtentReportTest
                 _extent = new ExtentReports();
                 var dir = AppDomain.CurrentDomain.BaseDirectory.Replace("\\bin\\Debug", "");
                 DirectoryInfo di = Directory.CreateDirectory(dir + "\\Test_Execution_Reports");
-                var htmlReporter = new ExtentSparkReporter(dir + "\\Test_Execution_Reports" + "\\Automation_Report" + ".html");
+                DateTime fechaHoraActual = DateTime.Now;
+
+                var fechaArchivo = fechaHoraActual.ToString("yyyyMMdd_HHmmss");
+                /*fechaArchivo = fechaArchivo.Replace("/", "");
+                fechaArchivo = fechaArchivo.Replace(":","");
+                fechaArchivo = fechaArchivo.Replace(" ", "_");*/
+
+                var htmlReporter = new ExtentSparkReporter(dir + "\\Test_Execution_Reports" + "\\Automation_Report_" + fechaArchivo + ".html");
                 
                 /*htmlReporter.Config.Theme = Theme.Dark;
                 htmlReporter.Config.ReportName = "Estatus de Pruebas Automatizadas" + DateTime.Now;
@@ -86,8 +93,6 @@ namespace SeleniumExtentReportTest
                     {
                         var slDocument = new SLDocument(fileStream);
 
-                        //using (SLDocument sl = new SLDocument(pathFile))
-                        //{
                         int iRow = 2;
                         int iColumn = 1;
                         arrVehiculos = new string[iRow - 1, 35];
@@ -119,6 +124,11 @@ namespace SeleniumExtentReportTest
                 string chromeProfilePath = @"C:\Users\mvelasc2\source\repos\Perfil";
                 var chromeOptions = new ChromeOptions();
                 chromeOptions.AddArgument($"user-data-dir={chromeProfilePath}");
+
+                chromeOptions.AddArguments("--no-sandbox");
+                chromeOptions.AddArguments("--disable-extensions");
+                chromeOptions.AddArguments("--disable-infobars");
+                chromeOptions.AddArguments("--remote-debugging-port=9222");
 
                 new DriverManager().SetUpDriver(new ChromeConfig());
                 driver = new ChromeDriver(chromeOptions);
@@ -1417,7 +1427,9 @@ namespace SeleniumExtentReportTest
                         break;
                     default:
                         logstatus = Status.Pass;
+                        screenShotPath = Capture(driver, TestContext.CurrentContext.Test.Name);
                         _test.Log(logstatus, "Estatus de la Prueba: " + logstatus);
+                        _test.Log(logstatus, "Print" + _test.AddScreenCaptureFromPath(screenShotPath));
                         break;
                 }
                 driver.Quit();
@@ -1444,18 +1456,21 @@ namespace SeleniumExtentReportTest
         }
 
         //Capturar Pantallas para agregar al reporte.
-        private string Capture(IWebDriver driver, string screenShotName)
+        public string Capture(IWebDriver driver, string screenShotName)
         {
             string localpath = "";
             try
             {
+                DateTime fechaTakeScreen = DateTime.Now;
+                var fechaArchivo = fechaTakeScreen.ToString("yyyyMMdd_HHmmss");
+
                 Thread.Sleep(4000);
                 ITakesScreenshot ts = (ITakesScreenshot)driver;
                 Screenshot screenshot = ts.GetScreenshot();
                 string pth = System.Reflection.Assembly.GetCallingAssembly().CodeBase;
                 var dir = AppDomain.CurrentDomain.BaseDirectory.Replace("\\bin\\Debug", "");
                 DirectoryInfo di = Directory.CreateDirectory(dir + "\\Defect_Screenshots\\");
-                string finalpth = pth.Substring(0, pth.LastIndexOf("bin")) + "\\Defect_Screenshots\\" + screenShotName + ".png";
+                string finalpth = pth.Substring(0, pth.LastIndexOf("bin")) + "\\Defect_Screenshots\\" + screenShotName + "_" + fechaTakeScreen.ToString("yyyyMMdd_HHmmss") + ".png";
                 localpath = new Uri(finalpth).LocalPath;
                 screenshot.SaveAsFile(localpath);
             }

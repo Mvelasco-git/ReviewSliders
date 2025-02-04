@@ -18,12 +18,13 @@ using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Wordprocessing;
 using AngleSharp.Text;
 using ZstdSharp.Unsafe;
+using SeleniumExtentReportTest;
 
 namespace Revisión_Precios_APITest
 {
     public class DealerSession
     {
-        private static IWebDriver _driver;
+        public static IWebDriver _driver;
         private WebDriverWait explicitWait;
         private string[] arrNameImage;
         private static string userEnviorement = "mazda-qa:qaqwpozxmn09";
@@ -664,24 +665,17 @@ namespace Revisión_Precios_APITest
                 DealerSession dealerSession = new DealerSession(_driver);
                 dealerSession.IngresarURLWeb(enviorement);
 
-                /*IWebElement ctaAceptarCookies = DealerSession.WaitObjects("//a[@id='opt-accept']", _driver, 1);
-                dealerSession.ClickMethod(ctaAceptarCookies, _driver);*/
-
                 var clientAPI = new RestClient("https://www.mazda.mx/");
                 var resquestAPI = new RestRequest("api/vehicle/current/format-1", Method.Get);
                 RestResponse response = clientAPI.Get(resquestAPI);
                 var content = response.Content;
                 var carsInformationJson = JsonConvert.DeserializeObject<ApiResponse>(content);
 
-                //var reponseBody = response.Content;
-                //List<string> responseBodyList = content.Replace("},", "").Replace("]", "").Trim().Split('{', '}').ToList();
-
                 int indexExcel = 0;
 
                 foreach (var itemExcel in ArrVehiclesExcel)
                 {
-                    if (itemExcel.verify)
-                    {
+                    
                         IWebElement lnkVehiculos = DealerSession.WaitObjects("//*[@data-analytics-link-description='VEHÍCULOS']", _driver, 0);
                         dealerSession.ClickMethod(lnkVehiculos, _driver);
                         dealerSession.WaitForPageLoad();
@@ -733,33 +727,57 @@ namespace Revisión_Precios_APITest
                                         case 7:
                                             versionJson = $"{arrNameVehicles[3]} {arrNameVehicles[4]} {arrNameVehicles[5]}";
                                             break;
+                                        case 8:
+                                            if (arrNameVehicles[2] == "RF")
+                                            {
+                                                versionJson = $"{arrNameVehicles[4]} {arrNameVehicles[5]} {arrNameVehicles[6]}";
+                                            }
+                                            else {
+                                                versionJson = $"{arrNameVehicles[3]} {arrNameVehicles[4]} {arrNameVehicles[5]} {arrNameVehicles[6]}";
+                                            }
+                                            break;
                                         default:
                                             versionJson = $"{arrNameVehicles[3]}";
                                             break;
                                     }
 
-                                    if (itemExcel.name.Contains("MAZDA2") || (itemExcel.name.Contains("MAZDA3") && itemExcel.type.Contains("SEDÁN")))
+                                    switch(itemExcel.name)
                                     {
-                                        if (arrNameVehicles[totWordsDes - 1] == "TA" && (versionJson == "I" || versionJson == "I SPORT"))
-                                        {
-                                            indiceVerExcel = indiceVerExcel - 1;
-                                            int precioTA = int.Parse(itemExcel.versions[indiceVerExcel].price.Replace(",", ""));
-                                            itemExcel.versions[indiceVerExcel].price = (precioTA + 10000).ToString();
-                                        }
+                                        case "MAZDA2":
+                                            if (arrNameVehicles[totWordsDes - 1] == "TA" && (versionJson == "I" || versionJson == "I SPORT"))
+                                            {
+                                                indiceVerExcel = indiceVerExcel - 1;
+                                                int precioTA = int.Parse(itemExcel.versions[indiceVerExcel].price.Replace(",", ""));
+                                                itemExcel.versions[indiceVerExcel].price = (precioTA + 10000).ToString();
+                                            }
+                                            break;
+
+                                        case "MAZDA3":
+                                            if (arrNameVehicles[totWordsDes - 1] == "TA" && itemExcel.type.Contains("SEDÁN") && versionJson == "I")
+                                            {
+                                                indiceVerExcel = indiceVerExcel - 1;
+                                                int precioTA = int.Parse(itemExcel.versions[indiceVerExcel].price.Replace(",", ""));
+                                                itemExcel.versions[indiceVerExcel].price = (precioTA + 9000).ToString();
+                                            }
+                                            break;
                                     }
 
                                     if (itemExcel.versions[indiceVerExcel].name.ToUpper() != versionJson || itemExcel.versions[indiceVerExcel].price.Replace(",", "") != vehicleOfJson.trims[versionsCarIndex].price)
                                     {
                                         throw new Exception($"La informarción del vehículo no corresponde, Vehículo: {arrNameVehicles[0]} {versionJson} {arrNameVehicles[totWordsDes - 1]}, Precio: {vehicleOfJson.trims[versionsCarIndex].price}");
                                     }
+                                    else
+                                    {
+
+                                    }
 
                                     indiceVerExcel++;
                                 }
                             }
                         }
-                    }
+                    
                     indexExcel++;
-                    //Assert.AreEqual(response.StatusCode, System.Net.HttpStatusCode.OK);
+                   
                 }
             }
             catch (Exception err)
