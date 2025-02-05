@@ -10,15 +10,8 @@ using System.Threading;
 using System.Collections.Generic;
 using RestSharp;
 using Newtonsoft.Json;
-using System.Text.Json.Serialization;
-using System.Linq;
-using System.IO;
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Wordprocessing;
-using AngleSharp.Text;
-using ZstdSharp.Unsafe;
-using SeleniumExtentReportTest;
+
 
 namespace Revisión_Precios_APITest
 {
