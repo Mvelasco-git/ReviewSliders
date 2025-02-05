@@ -656,7 +656,7 @@ namespace Revisión_Precios_APITest
             public string price { get; set; }
         }
 
-        public void reviewWebSite(string[,] arrVehiculos, bool seoCheck, bool fichaCheck)
+        public void reviewWebSite()
         {
             try
             {

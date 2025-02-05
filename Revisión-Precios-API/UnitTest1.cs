@@ -53,21 +53,8 @@ namespace SeleniumExtentReportTest
                 DateTime fechaHoraActual = DateTime.Now;
 
                 var fechaArchivo = fechaHoraActual.ToString("yyyyMMdd_HHmmss");
-                /*fechaArchivo = fechaArchivo.Replace("/", "");
-                fechaArchivo = fechaArchivo.Replace(":","");
-                fechaArchivo = fechaArchivo.Replace(" ", "_");*/
-
                 var htmlReporter = new ExtentSparkReporter(dir + "\\Test_Execution_Reports" + "\\Automation_Report_" + fechaArchivo + ".html");
-                
-                /*htmlReporter.Config.Theme = Theme.Dark;
-                htmlReporter.Config.ReportName = "Estatus de Pruebas Automatizadas" + DateTime.Now;
-                htmlReporter.Config.DocumentTitle = "Estatus de Pruebas Automatizadas";
-                */
-
-                /*_extent.AddSystemInfo("Ambiente", "Producción");
-                _extent.AddSystemInfo("User Name", "Manuel Velasco");
-                _extent.AddSystemInfo("Navegador","Chrome");*/
-
+             
                 _extent.AttachReporter(htmlReporter);
             }
             catch (Exception e)
@@ -114,9 +101,6 @@ namespace SeleniumExtentReportTest
                         }
                     }
                 }
-                //userEnviorement = "mazda-qa:qaqwpozxmn09";
-                //enviorement = "qa.mdp.mzd.mx";
-                //enviorement = "www.mazda.mx";
 
                 seoCheck = false;
                 fichaCheck = true;
@@ -146,7 +130,7 @@ namespace SeleniumExtentReportTest
             {
                 DealerSession dealerSession = new DealerSession(driver);
                 String s = string.Empty;
-                dealerSession.reviewWebSite(arrVehiculos, seoCheck, fichaCheck);
+                dealerSession.reviewWebSite();
             }
             catch (Exception err)
             {
