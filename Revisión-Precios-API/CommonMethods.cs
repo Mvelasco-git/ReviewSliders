@@ -394,9 +394,9 @@ namespace Revisión_Precios_APITest
                             carPrice = priceCar[i].Text;
                         }
 
-                        carPrice2 = carPrice.Substring(8, carPrice.Length - 9);
+                        carPrice = carPrice.Substring(8, carPrice.Length - 9);
                         dealerSession.ValidationText(textName, descripcion + " " + modelcar);
-                        dealerSession.ValidationText(carPrice2, price);
+                        dealerSession.ValidationText(carPrice, price);
 
                         dealerSession.ClickMethod(imgVehiculo, _driver);
                         dealerSession.WaitIsVisible("//*[@class='mde-specs-title']");
@@ -680,14 +680,14 @@ namespace Revisión_Precios_APITest
                         dealerSession.ValidateImage(imgVehiculo, itemExcel.image_name);
 
                         dealerSession.OnlyWait();
-                        List<IWebElement> textNameCar = new List<IWebElement>(_driver.FindElements(By.XPath("//*[@class='carName table-title']")));
-                        List<IWebElement> priceCar = new List<IWebElement>(_driver.FindElements(By.XPath("//*[@class='carPrice table-title']")));
+                        List<IWebElement> textNameCar = new List<IWebElement>(_driver.FindElements(By.XPath("//*[@class='carName']")));
+                        List<IWebElement> priceCar = new List<IWebElement>(_driver.FindElements(By.XPath("//*[@class='carPrice']")));
 
                         var siteTextName = textNameCar[indexExcel].Text;
-                        var siteCarPrice = priceCar[indexExcel].Text.Substring(8, priceCar[indexExcel].Text.Length - 9);
+                        var siteCarPrice = Regex.Replace(priceCar[indexExcel].Text.Substring(8, priceCar[indexExcel].Text.Length - 9), @"[\r\n]+", " ");
 
                         dealerSession.ValidationText(siteTextName, $"{itemExcel.name} {itemExcel.type}".Trim() + $" {itemExcel.model}");
-                        dealerSession.ValidationText(siteCarPrice, itemExcel.modelPrice);
+                        dealerSession.ValidationText(siteCarPrice.Trim(), itemExcel.modelPrice);
 
                         dealerSession.ClickMethod(imgVehiculo, _driver);
 
@@ -724,6 +724,10 @@ namespace Revisión_Precios_APITest
                                             if (arrNameVehicles[2] == "RF")
                                             {
                                                 versionJson = $"{arrNameVehicles[4]} {arrNameVehicles[5]} {arrNameVehicles[6]}";
+                                            }
+                                            else if(arrNameVehicles[2] == "35°")
+                                            {
+                                                versionJson = $"{arrNameVehicles[5]} {arrNameVehicles[6]}";
                                             }
                                             else {
                                                 versionJson = $"{arrNameVehicles[3]} {arrNameVehicles[4]} {arrNameVehicles[5]} {arrNameVehicles[6]}";
