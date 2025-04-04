@@ -330,12 +330,6 @@ namespace Revisión_Precios_APITest
 
         public void reviewPrices(string masterUrlDealer, string masternameDealer, string[,] arrVehiculos, bool seoCheck, bool fichaCheck)
         {
-            //string pathFile;
-            //string nombreVehiculo;
-            //public string[] arrNameImage;
-            //string[,] arrVehiculos;
-            //string errorMessage;
-            string carPrice2;
             string nameDealer;
             string urlDealer;
 
@@ -662,7 +656,7 @@ namespace Revisión_Precios_APITest
                 var resquestAPI = new RestRequest("api/vehicle/current/format-1", Method.Get);
                 RestResponse response = clientAPI.Get(resquestAPI);
                 var content = response.Content;
-                var carsInformationJson = JsonConvert.DeserializeObject<ApiResponse>(content);
+                var carsInformationJson = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResponse>(content);
 
                 int indexExcel = 0;
 
@@ -684,7 +678,7 @@ namespace Revisión_Precios_APITest
                         List<IWebElement> priceCar = new List<IWebElement>(_driver.FindElements(By.XPath("//*[@class='carPrice']")));
 
                         var siteTextName = textNameCar[indexExcel].Text;
-                        var siteCarPrice = Regex.Replace(priceCar[indexExcel].Text.Substring(8, priceCar[indexExcel].Text.Length - 9), @"[\r\n]+", " ");
+                        var siteCarPrice = Regex.Replace(priceCar[indexExcel].Text.Substring(8, priceCar[indexExcel].Text.Length - 9), @"[\r\n]+", "");
 
                         dealerSession.ValidationText(siteTextName, $"{itemExcel.name} {itemExcel.type}".Trim() + $" {itemExcel.model}");
                         dealerSession.ValidationText(siteCarPrice.Trim(), itemExcel.modelPrice);

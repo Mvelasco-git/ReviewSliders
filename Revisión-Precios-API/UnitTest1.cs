@@ -8,13 +8,10 @@ using WebDriverManager;
 using WebDriverManager.DriverConfigs.Impl;
 using AventStack.ExtentReports;
 using AventStack.ExtentReports.Reporter;
-using AventStack.ExtentReports.Reporter.Config;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using SpreadsheetLight;
-
 using Revisión_Precios_APITest;
-using SharpCompress.Common;
 
 namespace SeleniumExtentReportTest
 {
@@ -53,8 +50,8 @@ namespace SeleniumExtentReportTest
                 DateTime fechaHoraActual = DateTime.Now;
 
                 var fechaArchivo = fechaHoraActual.ToString("yyyyMMdd_HHmmss");
-                var htmlReporter = new ExtentSparkReporter(dir + "\\Test_Execution_Reports" + "\\Automation_Report_" + fechaArchivo + ".html");
-             
+                var htmlReporter = new ExtentHtmlReporter(dir + "\\Test_Execution_Reports" + "\\Automation_Report_" + fechaArchivo + ".html");
+
                 _extent.AttachReporter(htmlReporter);
             }
             catch (Exception e)
@@ -71,7 +68,7 @@ namespace SeleniumExtentReportTest
             try
             {
                 _test = _extent.CreateTest(TestContext.CurrentContext.Test.Name);
-                var dir = AppDomain.CurrentDomain.BaseDirectory.Replace("\\bin\\Debug", "");
+             /* var dir = AppDomain.CurrentDomain.BaseDirectory.Replace("\\bin\\Debug", "");
                 pathFile = dir + "Dealers.xlsx";
 
                 using (FileStream fileStream = new FileStream(pathFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
@@ -100,7 +97,7 @@ namespace SeleniumExtentReportTest
                             iColumn = 1;
                         }
                     }
-                }
+                }*/
 
                 seoCheck = false;
                 fichaCheck = true;
@@ -132,9 +129,9 @@ namespace SeleniumExtentReportTest
                 String s = string.Empty;
                 dealerSession.reviewWebSite();
             }
-            catch (Exception err)
+            catch (TypeInitializationException err)
             {
-                throw (err);
+                throw err.InnerException ?? new Exception("Error: ", err);
             }
         }
 
@@ -1399,13 +1396,13 @@ namespace SeleniumExtentReportTest
                 Status logstatus;
                 switch (status)
                 {
-                    case TestStatus.Failed:
+                    case NUnit.Framework.Interfaces.TestStatus.Failed:
                         logstatus = Status.Fail;
                         string screenShotPath = Capture(driver, TestContext.CurrentContext.Test.Name);
                         _test.Log(logstatus, "Estatus de la Prueba: " + logstatus + " – " + errorMessage);
                         _test.Log(logstatus, "Print del Error: " + _test.AddScreenCaptureFromPath(screenShotPath));
                         break;
-                    case TestStatus.Skipped:
+                    case NUnit.Framework.Interfaces.TestStatus.Skipped:
                         logstatus = Status.Skip;
                         _test.Log(logstatus, "Estatus de la Prueba: " + logstatus);
                         break;
