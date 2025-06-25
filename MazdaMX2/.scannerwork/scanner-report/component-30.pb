@@ -1,1 +1,0 @@
- 2xmlX¿¡hrbin/Debug/nunit.framework.xml
