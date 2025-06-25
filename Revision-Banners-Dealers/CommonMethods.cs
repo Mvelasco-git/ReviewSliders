@@ -330,6 +330,7 @@ namespace Revision_Banners_Dealers
 
         public void reviewPrices(string masterUrlDealer, string masternameDealer, string[,] arrVehiculos, bool seoCheck, bool fichaCheck)
         {
+            //Agregamos un comentario para verificar que el cambio se suba a Github
             
             try
             {
