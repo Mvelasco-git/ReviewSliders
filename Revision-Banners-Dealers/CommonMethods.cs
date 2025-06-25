@@ -330,36 +330,22 @@ namespace Revision_Banners_Dealers
 
         public void reviewPrices(string masterUrlDealer, string masternameDealer, string[,] arrVehiculos, bool seoCheck, bool fichaCheck)
         {
-            string nameDealer;
-            string urlDealer;
-
+            
             try
             {
 
                 DealerSession dealerSession = new DealerSession(_driver);
                 dealerSession.IngresarURL(userEnviorement, enviorement, masterUrlDealer);
 
-                /*IWebElement ctaAceptarCookies = DealerSession.WaitObjects("//a[@id='opt-accept']", _driver, 1);
-                dealerSession.ClickMethod(ctaAceptarCookies,_driver);*/
-
-                //IWebElement lnkVehiculos = DealerSession.WaitObjects("//*[@data-analytics-link-description='VEHÍCULOS']", _driver, 0);
-                //dealerSession.ClickMethod(lnkVehiculos, _driver);
-                //dealerSession.WaitForPageLoad();
-
                 for (int i = 0; i < arrVehiculos.GetLength(0); i++)
                 {
-                    string textName = "";
-                    string carPrice = "";
                     bool verify = Convert.ToBoolean(arrVehiculos.GetValue(i, 0));
                     string nameImage = arrVehiculos.GetValue(i, 1).ToString().Trim();
                     string copyTitle = arrVehiculos.GetValue(i, 2).ToString().Trim();
                     string priceCar = arrVehiculos.GetValue(i, 3).ToString().Trim();
                     string specName1 = arrVehiculos.GetValue(i, 4).ToString().Replace("N/A", "").Trim();
-                    //string descripcion = carname + " " + cartype;
-                    //descripcion = descripcion.Trim();
                     string specName2 = arrVehiculos.GetValue(i, 5).ToString().Trim();
                     string specName3 = arrVehiculos.GetValue(i, 6).ToString().Trim();
-                    //int totVersiones = 0;
 
                     if (verify == true)
                     {
@@ -389,112 +375,6 @@ namespace Revision_Banners_Dealers
                             dealerSession.ValidationText(specName3, listItemSlider[2].Text.Trim());
                         }
 
-                        //List<IWebElement> priceCar = new List<IWebElement>(_driver.FindElements(By.XPath("//*[@class='carPrice table-title']")));
-                        //textName = textNameCar[i].Text;
-                        //carPrice = priceCar[i].Text;
-
-                        /*
-                        while (textName.Length == 0)
-                        {
-                            textNameCar = new List<IWebElement>(_driver.FindElements(By.XPath("//*[@class='carName table-title']")));
-                            priceCar = new List<IWebElement>(_driver.FindElements(By.XPath("//*[@class='carPrice table-title']")));
-                            textName = textNameCar[i].Text;
-                            carPrice = priceCar[i].Text;
-                        }
-
-                        carPrice = carPrice.Substring(8, carPrice.Length - 9);
-                        dealerSession.ValidationText(textName, descripcion + " " + modelcar);
-                        dealerSession.ValidationText(carPrice, price);
-
-                        dealerSession.ClickMethod(imgVehiculo, _driver);
-                        dealerSession.WaitIsVisible("//*[@class='mde-specs-title']");
-                        string txtVehicle = dealerSession.ObtainText("//*[@class='mde-specs-title']");
-                        dealerSession.ValidationText(descripcion + " " + modelcar, txtVehicle);
-
-                        
-                        if (seoCheck)
-                        {
-                            nameDealer = _driver.Title;
-                            urlDealer = _driver.Url;
-                            var metaDescriptionElement = _driver.FindElement(By.XPath("//meta[@name='description']"));
-                            string metaDescription = metaDescriptionElement.GetAttribute("content");
-
-                            dealerSession.validateSEO(nameDealer, masternameDealer, textName, metaDescription, price);
-                            dealerSession.ValidationContentText(urlDealer, masterUrlDealer);
-                        }
-
-                        for (int j = 6; j < arrVehiculos.GetUpperBound(1); j += 5)
-                        {
-                            if (arrVehiculos[i, j] != null)
-                            {
-                                String versionCar = arrVehiculos.GetValue(i, j).ToString().Trim();
-                                String price2 = arrVehiculos.GetValue(i, j + 1).ToString();
-                                String hpTest = arrVehiculos.GetValue(i, j + 2).ToString();
-                                String torqueTest = arrVehiculos.GetValue(i, j + 3).ToString();
-                                String motorTest = arrVehiculos.GetValue(i, j + 4).ToString();
-                                totVersiones = totVersiones + 1;
-
-                                IWebElement carVersion = DealerSession.WaitObjects("//*[@data-analytics-link-description='" + versionCar + "']", _driver, 0);
-                                dealerSession.ClickMethod(carVersion, _driver);
-                                String price3 = dealerSession.ObtainText("//*[@class='mde-price-detail-ms active']");
-
-                                while (price3.Length == 0)
-                                {
-                                    price3 = dealerSession.ObtainText("//*[@class='mde-price-detail-ms active']");
-                                }
-
-                                price3 = price3.Substring(9, price2.Length);
-                                String hpVehiculo = dealerSession.ObtainText("(//*[@class='mde-specs-ms__stats--item active']/div[@class='item-stats']/div[@class='item-stats--value'])[1]");
-                                String tVehiculo = dealerSession.ObtainText("(//*[@class='mde-specs-ms__stats--item active']/div[@class='item-stats']/div[@class='item-stats--value'])[2]");
-                                String mVehiculo = dealerSession.ObtainText("(//*[@class='mde-specs-ms__stats--item active']/div[@class='item-stats']/div[@class='item-stats--value'])[3]");
-
-                                dealerSession.ValidationText(price2, price3);
-                                dealerSession.ValidationText(hpTest, hpVehiculo);
-                                dealerSession.ValidationText(torqueTest, tVehiculo);
-                                dealerSession.ValidationText(motorTest, mVehiculo);
-
-                                IWebElement btnCotiza = DealerSession.WaitObjects("//*[@data-analytics-link-description='COTIZA TU MAZDA']", _driver, 1);
-                                dealerSession.ClickMethod(btnCotiza, _driver);
-                                dealerSession.WaitForPageLoad();
-
-                                nameDealer = _driver.Title;
-                                dealerSession.ValidationContentText(nameDealer, masternameDealer);
-
-                                String vehiculo = dealerSession.ObtainAttribute("//*[@class='select2-selection__rendered active-input']", "title");
-                                String versionCar2 = dealerSession.ConvertText(versionCar);
-                                String version = dealerSession.ObtainAttribute("//*[@title='" + versionCar2 + "']",
-                                                                               "title");
-                                dealerSession.ValidationText(descripcion + " " + modelcar, vehiculo);
-                                dealerSession.ValidationText(versionCar2, version);
-
-                                _driver.Navigate().Back();
-                                dealerSession.WaitForPageLoad();
-                            }
-                            else
-                            {
-                                j = arrVehiculos.GetLength(1);
-                            }
-                        }
-
-                        int totalVersiones_2 = dealerSession.obtenerListado("//*[@class='component-navigation-1']/ul/li").Count;
-                        dealerSession.validateNumbers(totVersiones, totalVersiones_2);
-
-                        if (fichaCheck)
-                        {
-                            if (descripcion.Contains("MX-5 RF"))
-                            {
-                                descripcion = descripcion.Replace("MX-5 RF", "MX-5");
-                            }
-                            dealerSession.validateFicha(descripcion, modelcar);
-                        }
-
-                        _driver.Navigate().Back();
-                        dealerSession.WaitForPageLoad();
-                        IWebElement btnBack = DealerSession.WaitObjects("//*[@data-analytics-link-description='REGRESAR A VEHÍCULOS']", _driver, 1);
-                        dealerSession.ClickMethod(btnBack, _driver);
-                        dealerSession.WaitForPageLoad();
-
-                    }*/
                     }
 
                 }
